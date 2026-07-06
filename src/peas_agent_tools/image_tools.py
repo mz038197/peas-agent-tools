@@ -1,18 +1,22 @@
-"""Vision read_image tool factory."""
+"""Vision and generation image tools."""
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
+from typing import Literal
 
-from langchain_core.tools import StructuredTool
+from langchain_core.tools import StructuredTool, tool
 
 from peas_agent_tools.media import guess_media_type
 from peas_agent_tools.paths import resolve_project_image_path
+from peas_agent_tools.vcr_image import generate_vcr_image
 
 _READ_IMAGE_ALLOWED_SUFFIXES = frozenset({".png", ".jpg", ".jpeg", ".webp"})
 _READ_IMAGE_MAX_BYTES = 8 * 1024 * 1024
 
 VisionAnalyzer = Callable[[str, str, bytes, str], str]
+PresetName = Literal["icon", "ui_mockup", "photo"]
 
 
 def create_read_image_tool(analyzer: VisionAnalyzer) -> StructuredTool:
@@ -57,3 +61,35 @@ def read_image_without_analyzer(path: str, question: str = "描述此截圖內�
     """Placeholder when no vision analyzer is configured."""
     _ = path, question
     return "Error: read_image requires a vision_analyzer; configure via get_builtin_tools()"
+
+
+@tool("generate_image")
+def generate_image(
+    prompt: str,
+    output_path: str = "assets/generated/image.png",
+    preset: PresetName | None = None,
+    model: str = "",
+    aspect_ratio: str = "",
+    resolution: str = "",
+    reference_paths: list[str] | None = None,
+) -> str:
+    """透過 VCR 生圖並寫入專案路徑。preset 可選 icon / ui_mockup / photo；reference_paths 為本機參考圖路徑列表。"""
+    try:
+        result = generate_vcr_image(
+            prompt=prompt,
+            output_path=output_path,
+            preset=preset,
+            model=model,
+            aspect_ratio=aspect_ratio,
+            resolution=resolution,
+            reference_paths=reference_paths,
+        )
+        return json.dumps(result, ensure_ascii=False)
+    except ValueError as e:
+        return f"Error: {e}"
+    except FileNotFoundError as e:
+        return f"Error: {e}"
+    except RuntimeError as e:
+        return f"Error: {e}"
+    except Exception as e:
+        return f"Error: {e}"

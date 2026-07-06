@@ -3,14 +3,22 @@ from __future__ import annotations
 import pytest
 
 from peas_agent_tools import BUILTIN_TOOL_NAMES, get_builtin_tools
+from peas_agent_tools.tools_config import reset_tools_config_for_tests
+from peas_agent_tools.vcr_image import configure_image
 from peas_agent_tools.web import configure_web
 
 
 @pytest.fixture(autouse=True)
-def reset_web_settings() -> None:
+def reset_config(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("VSROUTER_API_KEY", raising=False)
+    monkeypatch.setenv("PEAS_AGENT_NO_AUTO_CONFIG", "1")
+    reset_tools_config_for_tests()
     configure_web({"tools": {"web": {"enable": True}}})
+    configure_image({"tools": {"image": {"enable": True, "apiKey": ""}}})
     yield
+    reset_tools_config_for_tests()
     configure_web({"tools": {"web": {"enable": True}}})
+    configure_image({"tools": {"image": {"enable": True, "apiKey": ""}}})
 
 
 def test_include_none_matches_full_default_set() -> None:
@@ -27,6 +35,18 @@ def test_include_none_matches_full_default_set() -> None:
         "web_search",
         "web_fetch",
     }
+
+
+def test_include_none_with_generate_image_when_key_set() -> None:
+    configure_image({"tools": {"image": {"enable": True, "apiKey": "vcr_sk_x"}}})
+    names = {t.name for t in get_builtin_tools()}
+    assert "generate_image" in names
+
+
+def test_include_none_omits_generate_image_when_disabled() -> None:
+    configure_image({"tools": {"image": {"enable": False, "apiKey": "vcr_sk_x"}}})
+    names = {t.name for t in get_builtin_tools()}
+    assert "generate_image" not in names
 
 
 def test_include_subset() -> None:
@@ -49,6 +69,12 @@ def test_include_web_search_when_web_disabled() -> None:
     assert [t.name for t in tools] == ["web_search"]
 
 
+def test_include_generate_image_when_image_disabled() -> None:
+    configure_image({"tools": {"image": {"enable": False, "apiKey": ""}}})
+    tools = get_builtin_tools(include=["generate_image"])
+    assert [t.name for t in tools] == ["generate_image"]
+
+
 def test_include_none_omits_web_when_disabled() -> None:
     configure_web({"tools": {"web": {"enable": False}}})
     names = {t.name for t in get_builtin_tools()}
@@ -57,4 +83,4 @@ def test_include_none_omits_web_when_disabled() -> None:
 
 
 def test_builtin_tool_names_constant() -> None:
-    assert len(BUILTIN_TOOL_NAMES) == 9
+    assert len(BUILTIN_TOOL_NAMES) == 10

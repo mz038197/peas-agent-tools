@@ -1,7 +1,7 @@
 [project]
 name = "peas-agent-tools"
-version = "0.1.1"
-description = "PEAS Agent built-in LangChain tools — file, exec, web, and path helpers"
+version = "0.1.2"
+description = "PEAS Agent built-in LangChain tools — file, exec, web, image gen, and path helpers"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -28,3 +28,6 @@ pythonpath = ["src", "tests"]
 dev = [
     "pytest>=9.0.3",
 ]
+
+[project.scripts]
+peas-tools-init = "peas_agent_tools.init_cli:main"
