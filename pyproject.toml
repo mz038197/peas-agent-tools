@@ -1,6 +1,6 @@
 [project]
 name = "peas-agent-tools"
-version = "0.1.0"
+version = "0.1.1"
 description = "PEAS Agent built-in LangChain tools — file, exec, web, and path helpers"
 readme = "README.md"
 requires-python = ">=3.12"

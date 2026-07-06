@@ -1,6 +1,13 @@
 """PEAS Agent built-in LangChain tools."""
 
-from peas_agent_tools.config import ToolSettings, configure, get_exec_default_timeout, get_settings
+from peas_agent_tools.config import (
+    PROJECT_ROOT_MARKERS,
+    ToolSettings,
+    configure,
+    discover_project_root,
+    get_exec_default_timeout,
+    get_settings,
+)
 from peas_agent_tools.demo import add_numbers
 from peas_agent_tools.exec_tools import decode_process_output, exec_workspace
 from peas_agent_tools.file_tools import edit_file, list_dir, read_file, write_file
@@ -12,6 +19,7 @@ from peas_agent_tools.paths import (
     resolve_workspace_path,
 )
 from peas_agent_tools.registry import (
+    BUILTIN_TOOL_NAMES,
     get_builtin_tools,
     get_exec_tool,
     get_file_tools,
@@ -20,6 +28,8 @@ from peas_agent_tools.registry import (
 from peas_agent_tools.web import configure_web, web_fetch, web_search, web_tools_enabled
 
 __all__ = [
+    "BUILTIN_TOOL_NAMES",
+    "PROJECT_ROOT_MARKERS",
     "ToolSettings",
     "VisionAnalyzer",
     "add_numbers",
@@ -27,6 +37,7 @@ __all__ = [
     "configure_web",
     "create_read_image_tool",
     "decode_process_output",
+    "discover_project_root",
     "edit_file",
     "exec_workspace",
     "get_builtin_tools",
