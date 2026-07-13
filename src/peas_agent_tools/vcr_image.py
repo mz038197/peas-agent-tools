@@ -92,7 +92,7 @@ def _resolve_api_key() -> str:
     key = (_IMAGE_SETTINGS.api_key or "").strip()
     if key:
         return key
-    env_key = os.environ.get("VSROUTER_API_KEY", "").strip()
+    env_key = os.environ.get("VCR_API_KEY", "").strip()
     if env_key:
         return env_key
     return ""
@@ -244,7 +244,7 @@ def generate_vcr_image(
     if not api_key:
         raise ValueError(
             "Missing API key. Set tools.image.apiKey in peas-tools.json "
-            "or VSROUTER_API_KEY (vcr_sk_... from Portal)."
+            "or VCR_API_KEY (vcr_sk_... from Portal)."
         )
 
     refs = [resolve_project_path(p) for p in (reference_paths or [])]

@@ -10,7 +10,7 @@ from peas_agent_tools.web import configure_web
 
 @pytest.fixture(autouse=True)
 def reset_config(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("VSROUTER_API_KEY", raising=False)
+    monkeypatch.delenv("VCR_API_KEY", raising=False)
     monkeypatch.setenv("PEAS_AGENT_NO_AUTO_CONFIG", "1")
     reset_tools_config_for_tests()
     configure_web({"tools": {"web": {"enable": True}}})
